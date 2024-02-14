@@ -1,0 +1,14 @@
+<article>
+    <form action="/api/sessions/login" method="post">
+        <header><h1>Inicio de session</h1></header>
+        <input type="text" name="email" placeholder="correo" required>
+        <input type="password" name="password" placeholder="contraseña" required>
+        <footer>
+            <a href="/views/recovery-pass" >Olvidé mi Contraseña</a>
+            <input type="submit" value="entrar">
+            <a href="/api/sessions/github" role="button">Login con Github</a>
+            <hr>
+        </footer>
+        <a href="/views/register" role="button">Registrarme</a>
+    </form>
+</article>
