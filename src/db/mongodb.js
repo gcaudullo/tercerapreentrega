@@ -1,13 +1,9 @@
 import mongoose from 'mongoose';
-
-export const URI = 'mongodb+srv://developer:EDadBkoCqBjXywzi@cluster0.cikumxo.mongodb.net/ecommerce?retryWrites=true&w=majority';
-
-
-// const URI = 'mongodb://localhost:27017/school';
-
+import config from '../config/config.js'
 
 export const init2 = async () => {
   try {
+    const URI = config.mongoDbUri;
     await mongoose.connect(URI);
     console.log('Database connected susscessfully 🚀');
   } catch (error) {

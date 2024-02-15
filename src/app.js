@@ -7,26 +7,14 @@ import viewsRouter from './routers/views.router.js';
 import sessionRouter from './routers/sessions.router.js';
 import handlebars from 'express-handlebars';
 import passport from 'passport';
-//import sessions from 'express-session';
-import MongoStore from 'connect-mongo';
-import { URI } from './db/mongodb.js';
 import { init as initPassport} from './config/passport.config.js';
 import cookieParse from 'cookie-parser';
+import config from './config/config.js'
 
 const app = express();
-// const SESSION_SECRET = 'Ma0(Q~6]R859oV)ws*)#Yks"£S6Y`f<j';
-// app.use(sessions({
-//   store: MongoStore.create({
-//     mongoUrl: URI,
-//     mongoOptions: {},
-//     ttl: 120,
-//   }),
-//   secret: SESSION_SECRET,
-//   resave: true,
-//   saveUninitialized: true,
-// }));
 
-const COOKIE_SECRET = 'Ma0(Q~6]R859oV)ws*)#Yks"£S6Y`f<j';
+
+let COOKIE_SECRET = config.cookieSecret
 app.use(cookieParse(COOKIE_SECRET))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

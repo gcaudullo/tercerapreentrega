@@ -3,12 +3,12 @@ import url from 'url';
 import bcrypt from 'bcrypt';
 import JWT from 'jsonwebtoken'
 import passport from 'passport';
-
+import config from './config/config.js'
 
 
 const __filename = url.fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename)
-export const JWT_SECRET = 't-Zy>e/}}*ong9`PQiZB_z!?y:C/G699'
+export const JWT_SECRET = config.jwtSecret;
 
 export const base_Url = 'http://localhost:8080/api/products';
 
