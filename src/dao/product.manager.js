@@ -1,20 +1,7 @@
 import ProductModel from './models/products.model.js';
 
 export default class ProductsManager {
-    static async initializeIdCounter() {
-        try {
-            const products = await ProductModel.find();
-            if (products.length > 0) {
-                const maxId = Math.max(...products.map(product => product.id));
-                return maxId + 1;
-            }
-            return 1; // Si no hay productos, comienza desde el ID 1
-        } catch (error) {
-            console.error('Error initializing ID counter:', error);
-            throw error;
-        }
-    }
-
+    
     static async addProduct(productData) {
         const { title, description, code, price, stock, category, thumbnails } = productData;
 

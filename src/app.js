@@ -4,7 +4,7 @@ import { __dirname } from './utils.js';
 import productsRouter from './routers/products.router.js';
 import cartsRouter from './routers/carts.router.js';
 import viewsRouter from './routers/views.router.js';
-import sessionRouter from './routers/sessions.router.js';
+import sessionRouter from './routers/users.router.js';
 import handlebars from 'express-handlebars';
 import passport from 'passport';
 import { init as initPassport} from './config/passport.config.js';
@@ -19,16 +19,16 @@ const app = express();
 let COOKIE_SECRET = config.cookieSecret
 app.use(cookieParse(COOKIE_SECRET))
 
-const whiteList = config.originsAllowed.split(',');
-app.use(cors({
-  origin: (origin, callback) => {
-    if (whiteList.includes(origin)){
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS.'))
-    }
-  } 
-}));
+// const whiteList = config.originsAllowed.split(',');
+// app.use(cors({
+//   origin: (origin, callback) => {
+//     if (whiteList.includes(origin)){
+//       callback(null, true)
+//     } else {
+//       callback(new Error('Not allowed by CORS.'))
+//     }
+//   } 
+// }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));

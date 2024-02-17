@@ -1,104 +1,78 @@
-import CartsManager from '../dao/cart.manager.js';
+// carts.router.js
+import CartsController from '../controllers/carts.controllers.js';
 import express from 'express';
-import { createHash, generateToken, isValidPassword, verifyToken, authMiddleware, authRolesMiddleware } from '../utils.js';
-
+import { authMiddleware, authRolesMiddleware } from '../utils.js';
 
 const router = express.Router();
 
 router.post('/carts', authMiddleware('jwt'), authRolesMiddleware('admin'), async (req, res) => {
     try {
-        const cartId = await CartsManager.addCart();
-        res.status(201).json({ message: 'Cart created successfully', cartId });
+        const result = await CartsController.addCart(req);
+        res.status(result.status).json(result.data);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error creating cart.' });
+        res.status(error.status || 500).json({ error: error.error || 'Internal Server Error' });
     }
 });
 
 router.get('/carts/:cid', authMiddleware('jwt'), authRolesMiddleware('admin'), async (req, res) => {
-    const cartId = req.params.cid;
-
     try {
-        const products = await CartsManager.getCartById(cartId);
-        if (products === -1) {
-            res.status(404).json({ error: 'There is no cart with that ID.' });
-        } else {
-            res.status(200).json(products);
-        }
+        const result = await CartsController.getCartById(req);
+        res.status(result.status).json(result.data);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error obtaining products.' });
+        res.status(error.status || 500).json({ error: error.error || 'Internal Server Error' });
     }
 });
 
 router.post('/carts/:cid/products/:pid', authMiddleware('jwt'), authRolesMiddleware('admin'), async (req, res) => {
-    const cartId = req.params.cid;
-    const productId = req.params.pid;
-    const quantity = req.body.quantity || 1;
-
     try {
-        await CartsManager.addProductToCart(cartId, productId, quantity);
-        res.status(201).json({ message: `Product id ${productId} added to Cart id ${cartId}!😎` });
+        const result = await CartsController.addProductToCart(req);
+        res.status(result.status).json(result.data);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error adding product to cart' });
+        res.status(error.status || 500).json({ error: error.error || 'Internal Server Error' });
     }
 });
 
-// DELETE api/carts/:cid/products/:pid
 router.delete('/carts/:cid/products/:pid', authMiddleware('jwt'), authRolesMiddleware('admin'), async (req, res) => {
-    const cartId = req.params.cid;
-    const productId = req.params.pid;
-
     try {
-        await CartsManager.removeProductFromCart(cartId, productId);
-        res.status(200).json({ message: `Product id ${productId} removed from Cart id ${cartId}! 😎` });
+        const result = await CartsController.removeProductFromCart(req);
+        res.status(result.status).json(result.data);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error removing product from cart.' });
+        res.status(error.status || 500).json({ error: error.error || 'Internal Server Error' });
     }
 });
 
-// PUT api/carts/:cid
 router.put('/carts/:cid', authMiddleware('jwt'), authRolesMiddleware('admin'), async (req, res) => {
-    const cartId = req.params.cid;
-    const products = req.body.products;
     try {
-        await CartsManager.updateCart(cartId, products);
-        res.status(200).json({ message: `Cart id ${cartId} updated with new products! 😎` });
+        const result = await CartsController.updateCart(req);
+        res.status(result.status).json(result.data);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error updating cart.' });
+        res.status(error.status || 500).json({ error: error.error || 'Internal Server Error' });
     }
 });
 
-// PUT api/carts/:cid/products/:pid
 router.put('/carts/:cid/products/:pid', authMiddleware('jwt'), authRolesMiddleware('admin'), async (req, res) => {
-    const cartId = req.params.cid;
-    const productId = req.params.pid;
-    const quantity = req.body.quantity;
-
     try {
-        await CartsManager.updateProductQuantity(cartId, productId, quantity);
-        res.status(200).json({ message: `Product id ${productId} quantity updated in Cart id ${cartId}! 😎` });
+        const result = await CartsController.updateProductQuantity(req);
+        res.status(result.status).json(result.data);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error updating product quantity in cart.' });
+        res.status(error.status || 500).json({ error: error.error || 'Internal Server Error' });
     }
 });
 
-// DELETE api/carts/:cid
 router.delete('/carts/:cid', async (req, res) => {
-    const cartId = req.params.cid;
-
     try {
-        await CartsManager.removeAllProductsFromCart(cartId);
-        res.status(200).json({ message: `All products removed from Cart id ${cartId}! 😎` });
+        const result = await CartsController.removeAllProductsFromCart(req);
+        res.status(result.status).json(result.data);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error removing all products from cart.' });
+        res.status(error.status || 500).json({ error: error.error || 'Internal Server Error' });
     }
 });
-
 
 export default router;
