@@ -45,6 +45,15 @@ class ProductsService {
             throw error;
         }
     }
+
+    static async updateProductStock(productId, newStock) {
+        try {
+            return ProductsManager.updateProduct(productId, { stock: newStock });
+        } catch (error) {
+            console.error('Error in ProductService.updateProductStock:', error);
+            throw error;
+        }
+    }
 }
 
 export default ProductsService;

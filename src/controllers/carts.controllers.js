@@ -89,4 +89,13 @@ export default class CartsController {
             throw { status: error.status || 500, error: error.error || 'Internal Server Error' };
         }
     }
+
+    static async purchaseCart(cartId, userId) {
+        try {
+            const result = await CartsService.purchaseCart(cartId, userId);
+            return { status: 200, data: result };
+        } catch (error) {
+            throw error;
+        }
+    }
 }

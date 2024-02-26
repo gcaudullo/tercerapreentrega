@@ -1,5 +1,7 @@
 // carts.service.js
 import CartsManager from '../dao/cart.manager.js';
+import ProductsService from '../services/products.service.js';
+import TicketService from './ticket.sevice.js';
 
 export default class CartsService {
     static async createCart() {
@@ -40,7 +42,7 @@ export default class CartsService {
         try {
             await CartsManager.removeProductFromCart(cartId, productId);
             return { message: `Product id ${productId} removed from Cart id ${cartId}! 😎` };
-        } catch (error) {
+        }catch (error) {
             console.error(error);
             throw { status: 500, error: 'Error removing product from cart.' };
         }
@@ -75,4 +77,100 @@ export default class CartsService {
             throw { status: 500, error: 'Error removing all products from cart.' };
         }
     }
+
+    static async purchaseCart(cartId, userId) {
+        try {
+            const cart = await CartsManager.getCartById(cartId);
+            if (!cart) {
+                return { success: false, message: 'Cart not found' };
+            }
+    
+            const purchaseResult = await this.processPurchase(cart);
+    
+            // Calcular el monto total de la compra
+            const totalAmount = await Promise.all(purchaseResult.map(async (result) => {
+                const cartItem = cart.products.find(item => item.product.toString() === result.productId.toString());
+                console.log('cartItem', cartItem);
+                if (cartItem) {
+                    const productData = await ProductsService.getProductById(cartItem.product);
+                    console.log('productData', productData);
+                    console.log('cartItem', cartItem);
+                    return productData ? cartItem.quantity * productData.price : 0;
+                }
+                return 0;
+            })).then(amounts => {
+                console.log('amounts', amounts);
+                return amounts.reduce((total, amount) => total + amount, 0);
+            });
+    
+            console.log('totalAmount', totalAmount);
+    
+            // Generar ticket
+            const ticketData = {
+                purchaser: userId,
+                amount: totalAmount,
+                purchaseResult,
+            };
+    
+            const ticket = await TicketService.generateTicket(ticketData);
+    
+            // Filtrar productos que no pudieron comprarse y actualizar el carrito
+            const updatedCart = await this.filterFailedPurchases(cart, purchaseResult);
+    
+            return { ticket, updatedCart };
+        } catch (error) {
+            throw error;
+        }
+    }
+    
+    
+    
+
+
+    static async processPurchase(cart) {
+        const purchaseResult = [];
+        // Verificar si cart.products está definido y es un array
+        if (!cart.products || !Array.isArray(cart.products)) {
+            throw { status: 500, error: 'Invalid cart format.' };
+        }
+    
+        for (const cartItem of cart.products) {
+            try {
+                const productData = await ProductsService.getProductById(cartItem.product);
+                if (!productData) {
+                    purchaseResult.push({ success: false, productId: cartItem.product, message: 'Product not found' });
+                    continue;
+                }
+    
+                if (productData.stock >= cartItem.quantity) {
+                    // Restar del stock y continuar
+                    await ProductsService.updateProductStock(cartItem.product, productData.stock - cartItem.quantity);
+                    purchaseResult.push({ success: true, productId: cartItem.product, message: 'Purchase successful' });
+                } else {
+                    // No hay suficiente stock
+                    purchaseResult.push({ success: false, productId: cartItem.product, message: 'Insufficient stock' });
+                }
+            } catch (error) {
+                console.error('Error processing purchase:', error);
+                purchaseResult.push({ success: false, productId: cartItem.product, message: 'Error processing purchase' });
+            }
+        }
+    
+        return purchaseResult;
+    }
+    
+
+    static async filterFailedPurchases(cart, purchaseResult) {
+        const failedProductIds = purchaseResult.filter(result => !result.success).map(result => result.productId);
+    
+        if (failedProductIds.length === 0) {
+            // No hay productos fallidos, todos fueron comprados con éxito
+            await CartsManager.removeAllProductsFromCart(cart._id);
+            return null;  // Retorna null indicando que el carrito está vacío
+        }
+    
+        const updatedCart = await CartsManager.filterFailedPurchases(cart, failedProductIds);
+        return updatedCart;
+    }
+    
 }

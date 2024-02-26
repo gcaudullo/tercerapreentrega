@@ -75,4 +75,17 @@ router.delete('/carts/:cid', async (req, res) => {
     }
 });
 
+router.post('/carts/:cid/purchase', authMiddleware('jwt'), async (req, res) => {
+    try {
+        const { cid } = req.params;
+        const userId = req.user.id; // Supongo que el usuario está almacenado en el token
+
+        const result = await CartsController.purchaseCart(cid, userId);
+        res.status(result.status).json(result.data);
+    } catch (error) {
+        console.error(error);
+        res.status(error.status || 500).json({ error: error.error || 'Internal Server Error' });
+    }
+});
+
 export default router;

@@ -16,17 +16,17 @@ export default class CartsManager {
 
     static async getCartById(cartId) {
         try {
-            const cart = await CartModel.findById(cartId).populate('products.product', '_id title description price status stock category');;
+            const cart = await CartModel.findById(cartId).populate('products.product', '_id title description price status stock category');
             if (!cart) {
-                return -1; // Devuelve -1 si el carrito no se encuentra
+                return -1; 
             } else {
-                return cart.products;
+                return cart; 
             }
         } catch (error) {
             console.error('Error getting cart by ID:', error);
             throw error;
         }
-    }
+    }    
 
     static async addProductToCart(cartId, productId, quantity) {
         try {
@@ -132,6 +132,16 @@ export default class CartsManager {
             console.log(`All products removed from Cart id ${cartId}! 😎`);
         } catch (error) {
             console.error('Error removing all products from cart:', error);
+            throw error;
+        }
+    }
+
+    static async filterFailedPurchases(cart, failedProductIds) {
+        try {
+            const updatedProducts = cart.products.filter(product => !failedProductIds.includes(product.product.toString()));
+            const updatedCart = await CartModel.findByIdAndUpdate(cart._id, { products: updatedProducts }, { new: true });
+            return updatedCart;
+        } catch (error) {
             throw error;
         }
     }

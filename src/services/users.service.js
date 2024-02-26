@@ -1,38 +1,38 @@
 // users.services.js
 import UsersDAO from '../dao/users.dao.js';
 import { createHash, generateToken, isValidPassword } from '../utils.js';
+import CartsService from '../services/carts.service.js';
 
 export default class UsersService {
   static async registerUser(userData) {
     try {
-      const { first_name, last_name, email, password, age } = userData;
+        const { first_name, last_name, email, password, age } = userData;
 
-      // Verificar si el usuario ya existe
-      const existingUser = await UsersDAO.getUserByEmail(email);
-      if (existingUser) {
-        throw { status: 409, error: 'El usuario ya está registrado.' };
-      }
+        // Crear un carrito para el usuario
+        const cartCreationResult = await CartsService.createCart();
+        const cartId = cartCreationResult.cartId;
 
-      // Crear un nuevo usuario
-      const hashedPassword = createHash(password);
-      const newUser = await UsersDAO.createUser({
-        first_name,
-        last_name,
-        email,
-        password: hashedPassword,
-        age,
-      });
+        // Crear un nuevo usuario con el ID del carrito
+        const hashedPassword = createHash(password);
+        const newUser = await UsersDAO.createUser({
+            first_name,
+            last_name,
+            email,
+            password: hashedPassword,
+            age,
+            cartId, 
+        });
 
-      // Generar token JWT
-      const token = generateToken(newUser._id);
+        // Generar token JWT
+        const token = generateToken(newUser._id);
 
-      // Devolver el token y cualquier otra información que desees
-      return { token, user: newUser };
+        // Devolver el token y cualquier otra información que desees
+        return { token, user: newUser };
     } catch (error) {
-      console.error('Error in user registration:', error);
-      throw { status: error.status || 500, error: error.error || 'Error en el registro.' };
+        console.error('Error in user registration:', error);
+        throw { status: error.status || 500, error: error.error || 'Error en el registro.' };
     }
-  }
+}
 
   static async loginUser(email, password) {
     try {
