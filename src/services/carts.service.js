@@ -87,23 +87,27 @@ export default class CartsService {
     
             const purchaseResult = await this.processPurchase(cart);
     
+            // Debugging: Imprimir el purchaseResult para verificar que tiene la información esperada
+            //console.log('purchaseResult:', purchaseResult);
+    
             // Calcular el monto total de la compra
             const totalAmount = await Promise.all(purchaseResult.map(async (result) => {
                 const cartItem = cart.products.find(item => item.product.toString() === result.productId.toString());
-                console.log('cartItem', cartItem);
+                //console.log('cartItem', cartItem);
                 if (cartItem) {
                     const productData = await ProductsService.getProductById(cartItem.product);
-                    console.log('productData', productData);
-                    console.log('cartItem', cartItem);
+                    // console.log('productData', productData);
+                    // console.log('cartItem', cartItem);
                     return productData ? cartItem.quantity * productData.price : 0;
                 }
                 return 0;
             })).then(amounts => {
-                console.log('amounts', amounts);
+                // console.log('amounts', amounts);
                 return amounts.reduce((total, amount) => total + amount, 0);
             });
     
-            console.log('totalAmount', totalAmount);
+            // Debugging: Imprimir el totalAmount para verificar su valor
+            // console.log('totalAmount', totalAmount);
     
             // Generar ticket
             const ticketData = {
