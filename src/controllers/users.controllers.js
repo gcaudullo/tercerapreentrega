@@ -1,12 +1,17 @@
-// users.controller.js
 import UsersService from '../services/users.service.js';
+import UserDTO from '../dto/user.dto.js';
 
 export default class UsersController {
   static async registerUser(req, res) {
     try {
       const userData = req.body;
       const result = await UsersService.registerUser(userData);
-      res.status(201).json(result);
+      
+      // Crea una instancia de UserDTO utilizando el resultado del servicio
+      const userDTO = new UserDTO(result.user);
+
+      // Envia la respuesta utilizando el DTO
+      res.status(201).json({ user: userDTO, token: result.token });
     } catch (error) {
       console.error('Error in user registration controller:', error);
       res.status(error.status || 500).json({ error: error.error || 'Internal Server Error' });
@@ -22,7 +27,12 @@ export default class UsersController {
         httpOnly: true,
         signed: true,
       });
-      res.status(200).json(result);
+
+      // Crea una instancia de UserDTO utilizando el resultado del servicio
+      const userDTO = new UserDTO(result.user);
+
+      // Envia la respuesta utilizando el DTO
+      res.status(200).json({ user: userDTO, token: result.token });
     } catch (error) {
       console.error('Error in user login controller:', error);
       res.status(error.status || 500).json({ error: error.error || 'Internal Server Error' });
@@ -38,6 +48,11 @@ export default class UsersController {
 
     try {
       const updatedUser = await UsersService.updatePassword(email, password);
+
+      // Si deseas, puedes crear una instancia de UserDTO aquí y enviarla en la respuesta
+      // const userDTO = new UserDTO(updatedUser);
+      // res.json({ user: userDTO });
+
       res.redirect('/views/login');
     } catch (error) {
       console.error('Error updating user password (controller):', error);
