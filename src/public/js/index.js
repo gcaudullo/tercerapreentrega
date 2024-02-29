@@ -84,6 +84,7 @@ async function actualizarVista(products) {
         <p><strong>Status</strong>: ${product.status}</p>
         <p><strong>Stock</strong>: ${product.stock}</p>
         <p><strong>Category</strong>: ${product.category}</p>
+        <button class="addToCartBtn" data-product-id="${product._id}">Agregar al Carrito</button> <!-- Agrega este botón -->
         <hr/>
       `;
             // Agrega el elemento del producto al div de la lista de productos.
@@ -109,3 +110,4 @@ if (formMessage) {
             console.log(`Hola ${email}, bienvenido 🖐`);
         });
 }
+

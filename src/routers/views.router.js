@@ -1,31 +1,26 @@
-import ProductsManager from '../dao/product.manager.js';
-import CartsManager from '../dao/cart.manager.js';
 import express from 'express';
+import ProductsService from '../services/products.service.js';
+import CartsService from '../services/carts.service.js';
 import { buildResponsePaginated } from '../utils.js';
+
 const router = express.Router();
 
 router.get('/profile', async (req, res) => {
-  // Comprueba si hay un usuario en la sesión
   const user = req.user;
-  // Si no hay usuario, redirige al inicio de sesión
   if (!user) {
     return res.redirect('/views/login');
   }
   try {
-    // Renderiza la vista de perfil con los datos del usuario
     res.render('profile', { title: 'Bienvenido a nuestro Ecommerce', user });
   } catch (error) {
-    // Maneja cualquier error que pueda ocurrir al renderizar la vista
     console.error(error);
     res.status(500).json({ error: 'Error rendering profile.' });
   }
 });
 
-
 router.get('/login', async (req, res) => {
   res.render('login', { title: 'Bienvenido a nuestro Ecommerce' });
 });
-
 
 router.get('/register', async (req, res) => {
   res.render('register', { title: 'Bienvenido a nuestro Ecommerce' });
@@ -37,21 +32,21 @@ router.get('/recovery-pass', async (req, res) => {
 
 router.get('/', async (req, res) => {
   const { limit = 10, page = 1, sort, category } = req.query;
-  // sort es por precio, posibles valores asc/desc
-  // search es por category
   const criteria = {};
-  const options = { limit, page }
-  const user = req.user;
+  const options = { limit, page };
+
   if (sort) {
     options.sort = { price: sort };
   }
   if (category) {
     criteria.category = category;
   }
+
   try {
-    const products = await ProductsManager.getProducts(criteria, options);
+    const products = await ProductsService.getProducts(criteria, options);
     const data = buildResponsePaginated({ ...products, sort, category }, 'http://localhost:8080/views');
-    res.render('home', { title: 'Productos 🚀', products: data , welcomeMessage: user ? `Bienvenido, ${user.first_name}! <br>Rol: ${user.role}`:''});
+    const user = req.user;
+    res.render('home', { title: 'Productos 🚀', products: data, welcomeMessage: user ? `Bienvenido, ${user.first_name}! <br>Rol: ${user.role}` : '' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error obtaining products.' });
@@ -66,17 +61,19 @@ router.get('/chat', (req, res) => {
   res.render('chat', { title: 'Chat de nuestro ecommerce 😎' });
 });
 
-// Ruta para visualizar un carrito específico
 router.get('/carts/:cid', async (req, res) => {
   const cartId = req.params.cid;
 
   try {
-    const cart = await CartsManager.getCartById(cartId);
+    const cart = await CartsService.getCartById(cartId);
     if (cart === -1) {
       res.status(404).json({ error: 'There is no cart with that ID.' });
     } else {
+      // Imprimir la estructura del objeto cart en la consola
+      console.log('Cart structure:', JSON.stringify(cart, null, 2));
+
       // Renderiza la vista de carrito con los productos
-      res.render('cart', { title: 'Carrito de Compras', cart });
+      res.render('cart', { title: 'Carrito de Compras', cart: cart.products });
     }
   } catch (error) {
     console.error(error);
@@ -86,4 +83,3 @@ router.get('/carts/:cid', async (req, res) => {
 
 
 export default router;
-

@@ -39,6 +39,7 @@ export default class UsersController {
     }
   }
 
+
   static async updatePassword(req, res) {
     const { body: { email, password } } = req;
     if (!email || !password) {
