@@ -84,7 +84,7 @@ async function actualizarVista(products) {
         <p><strong>Status</strong>: ${product.status}</p>
         <p><strong>Stock</strong>: ${product.stock}</p>
         <p><strong>Category</strong>: ${product.category}</p>
-        <button class="addToCartBtn" data-product-id="${product._id}">Agregar al Carrito</button> <!-- Agrega este botón -->
+        <button class="addToCartBtn" data-product-id="${product._id}" data-cart-id="${user.cartId}">Agregar al Carrito</button> 
         <hr/>
       `;
             // Agrega el elemento del producto al div de la lista de productos.
@@ -92,6 +92,7 @@ async function actualizarVista(products) {
         });
     }
 }
+
 
 if (formMessage) {
     Swal.fire({
@@ -111,3 +112,36 @@ if (formMessage) {
         });
 }
 
+document.addEventListener('click', async (event) => {
+    const button = event.target.closest('.addToCartBtn');
+    console.log("click")
+    if (button) {
+        event.preventDefault();
+        const productId = button.getAttribute('data-product-id');
+        const cartId = button.getAttribute('data-cart-id');
+
+        try {
+            // Obtén el token almacenado en las cookies
+            const token = document.cookie.split(';').find(cookie => cookie.trim().startsWith('token=')).split('=')[1];
+
+            // Realiza una solicitud al backend para agregar el producto al carrito
+            const response = await fetch(`/api/carts/${cartId}/products/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` // Incluye el token en el encabezado de autorización
+                },
+                body: JSON.stringify({ quantity: 1 }),  // Añade la cantidad al cuerpo de la solicitud
+            });
+
+            if (response.ok) {
+                console.log('Producto agregado al carrito correctamente');
+                // Aquí puedes agregar lógica adicional si es necesario, como actualizar la UI
+            } else {
+                console.error('Error al agregar el producto al carrito');
+            }
+        } catch (error) {
+            console.error('Error al procesar la solicitud:', error);
+        }
+    }
+});
