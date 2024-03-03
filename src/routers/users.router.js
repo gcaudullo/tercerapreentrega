@@ -15,6 +15,7 @@ router.post('/sessions/login', async (req, res) => {
 
 router.post('/sessions/recovery-password', async (req, res) => {
     await UsersController.updatePassword(req, res);
+    res.redirect('/views/login')
   });
 
 

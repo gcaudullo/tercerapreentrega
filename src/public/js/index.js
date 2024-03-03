@@ -112,36 +112,54 @@ if (formMessage) {
         });
 }
 
-document.addEventListener('click', async (event) => {
-    const button = event.target.closest('.addToCartBtn');
-    console.log("click")
-    if (button) {
-        event.preventDefault();
-        const productId = button.getAttribute('data-product-id');
-        const cartId = button.getAttribute('data-cart-id');
+document.addEventListener('DOMContentLoaded', () => {
+    const addToCartButtons = document.querySelectorAll('.addToCartBtn');
+    console.log(addToCartButtons);  // Verifica si los botones se seleccionan correctamente
 
-        try {
-            // Obtén el token almacenado en las cookies
-            const token = document.cookie.split(';').find(cookie => cookie.trim().startsWith('token=')).split('=')[1];
+    addToCartButtons.forEach((button) => {
+        button.addEventListener('click', async (event) => {
+            event.preventDefault();
+            const productId = button.getAttribute('data-product-id');
 
-            // Realiza una solicitud al backend para agregar el producto al carrito
-            const response = await fetch(`/api/carts/${cartId}/products/${productId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` // Incluye el token en el encabezado de autorización
-                },
-                body: JSON.stringify({ quantity: 1 }),  // Añade la cantidad al cuerpo de la solicitud
-            });
+            try {
+                // // Intenta obtener el token almacenado en las cookies
+                // const tokenCookie = document.cookie.split(';').find(cookie => cookie.trim().startsWith('token='));
+                // const token = tokenCookie ? tokenCookie.split('=')[1] : null;
+                // console.log('token', token)
 
-            if (response.ok) {
-                console.log('Producto agregado al carrito correctamente');
-                // Aquí puedes agregar lógica adicional si es necesario, como actualizar la UI
-            } else {
-                console.error('Error al agregar el producto al carrito');
+                const tokenCookie = document.cookie.match(/(^|[^;]+)\s*token\s*=\s*([^;]+)/);
+                const token = tokenCookie ? tokenCookie[2] : null;
+                console.log('Token:', token);
+                
+                if (token) {
+                    // Decodificar el token para acceder al cart_id
+                    const decodedToken = jwt.decode(token);
+                    const cartId = decodedToken ? decodedToken.cart_id : null;
+
+                    // Realiza una solicitud al backend para agregar el producto al carrito
+                    const response = await fetch(`/api/carts/${cartId}/products/${productId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}` // Incluye el token en el encabezado de autorización
+                        },
+                        body: JSON.stringify({ quantity: 1 }),  // Añade la cantidad al cuerpo de la solicitud
+                    });
+
+                    if (response.ok) {
+                        console.log('Producto agregado al carrito correctamente');
+                        // Aquí puedes agregar lógica adicional si es necesario, como actualizar la UI
+                    } else {
+                        console.error('Error al agregar el producto al carrito');
+                    }
+                } else {
+                    console.error('Token no encontrado');
+                }
+            } catch (error) {
+                console.error('Error al procesar la solicitud:', error);
             }
-        } catch (error) {
-            console.error('Error al procesar la solicitud:', error);
-        }
-    }
+        });
+    });
+
+    // Resto del código del evento DOMContentLoaded...
 });
