@@ -122,15 +122,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const productId = button.getAttribute('data-product-id');
 
             try {
-                // // Intenta obtener el token almacenado en las cookies
-                // const tokenCookie = document.cookie.split(';').find(cookie => cookie.trim().startsWith('token='));
-                // const token = tokenCookie ? tokenCookie.split('=')[1] : null;
-                // console.log('token', token)
+                // Intenta obtener el token almacenado en las cookies
+                const tokenCookie = document.cookie.split(';').find(cookie => cookie.trim().startsWith('token='));
+                const token = tokenCookie ? tokenCookie.split('=')[1] : null;
+                console.log('token', token)
 
-                const tokenCookie = document.cookie.match(/(^|[^;]+)\s*token\s*=\s*([^;]+)/);
-                const token = tokenCookie ? tokenCookie[2] : null;
-                console.log('Token:', token);
-                
+                // const tokenCookie = document.cookie.match(/(^|[^;]+)\s*token\s*=\s*([^;]+)/);
+                // const token = tokenCookie ? tokenCookie[2] : null;
+                // console.log('Token:', token);
+
                 if (token) {
                     // Decodificar el token para acceder al cart_id
                     const decodedToken = jwt.decode(token);
