@@ -1,6 +1,6 @@
 import express from 'express';
 import ProductsController from '../controllers/products.controllers.js';
-import { authMiddleware, authRolesMiddleware, buildResponsePaginated } from '../utils.js';
+import { authMiddleware, authRolesMiddleware, buildResponsePaginated, generateProduct } from '../utils.js';
 
 const router = express.Router();
 
@@ -58,6 +58,14 @@ router.delete('/products/:pid', authMiddleware('jwt'), authRolesMiddleware(['adm
         console.error(error);
         res.status(500).json({ error: 'Error deleting product' });
     }
+});
+
+router.get('/mockingproducts', async (req, res) => {
+    const products = [];
+    for (let index = 0; index < 100; index++) {
+        products.push(generateProduct());
+    }
+    res.status(200).json(products);
 });
 
 export default router;

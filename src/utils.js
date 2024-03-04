@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import JWT from 'jsonwebtoken'
 import passport from 'passport';
 import config from './config/config.js'
+import { faker } from '@faker-js/faker';
 
 
 const __filename = url.fileURLToPath(import.meta.url);
@@ -90,3 +91,21 @@ export const authRolesMiddleware = (roles) => (req, res, next) => {
     }
     next();
 }
+
+export const generateProduct = () => {
+    return {
+      id: faker.database.mongodbObjectId(),
+      title: faker.commerce.productName(),
+      description: faker.lorem.paragraph(),
+      code: faker.string.alphanumeric({ length: 10 }),
+      price: faker.commerce.price(),
+      status: faker.datatype.boolean(),
+      stock: faker.number.int({ min: 100, max: 300 }),
+      category: faker.commerce.department(),
+      thumbnails: faker.image.url(),
+      createdAt: faker.date.anytime(), 
+      updatedAt: faker.date.anytime()
+    }
+  };
+
+  
