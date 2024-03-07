@@ -25,6 +25,16 @@ router.get('/carts/:cid', authMiddleware('jwt'), authRolesMiddleware('admin'), a
     }
 });
 
+router.get('/getCartId', authMiddleware('jwt'), async (req, res) => {
+    try {
+        const result = await CartsController.getCartId(req);
+        res.status(result.status).json(result.data);
+    } catch (error) {
+        console.error(error);
+        res.status(error.status || 500).json({ error: error.error || 'Internal Server Error' });
+    }
+});
+
 router.post('/carts/:cid/products/:pid', authMiddleware('jwt'), authRolesMiddleware('admin'), async (req, res) => {
     try {
         const result = await CartsController.addProductToCart(req);

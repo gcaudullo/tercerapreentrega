@@ -1,5 +1,5 @@
 <article>
-    <form action="/api/sessions/login" method="post">
+    <form id="login" action="/api/sessions/login" method="post">
         <header><h1>Inicio de sesión</h1></header>
         {{#if error}}
             <p style="color: red;">{{error}}</p>
@@ -15,3 +15,4 @@
         <a href="/views/register" role="button">Registrarme</a>
     </form>
 </article>
+{{!-- <script src="/js/login.js"></script> --}}

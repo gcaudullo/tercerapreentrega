@@ -24,7 +24,7 @@ export default class UsersController {
       const result = await UsersService.loginUser(email, password);
       res.cookie('token', result.token, {
         maxAge: 1000 * 60 * 30, // 30 minutos
-        httpOnly: true,
+        httpOnly: false,
         signed: true,
       });
 

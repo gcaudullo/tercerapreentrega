@@ -98,4 +98,23 @@ export default class CartsController {
             throw error;
         }
     }
+
+    static async getCartId(req) {
+        try {
+            // Obtener el usuario desde el token
+            const userId = req.user.id;
+
+            // Obtener el cartId del usuario desde tu base de datos o cualquier almacenamiento
+            const cartId = await CartsService.getCartIdByUserId(userId);
+
+            if (cartId) {
+                return { status: 200, data: { cartId } };
+            } else {
+                return { status: 404, data: { error: 'CartId no encontrado para este usuario' } };
+            }
+        } catch (error) {
+            console.error(error);
+            throw { status: 500, error: 'Internal Server Error' };
+        }
+    }
 }

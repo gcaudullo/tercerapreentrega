@@ -33,4 +33,32 @@ export default class UserRepository {
       throw error;
     }
   }
+
+  static async getUserById(userId) {
+    try {
+      const user = await userModel.findById(userId);
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async updateUserCartId(userId, newCartId) {
+    try {
+      const updatedUser = await userModel.findByIdAndUpdate(
+        userId,
+        { $set: { cartId: newCartId } },
+        { new: true } // Devuelve el documento actualizado
+      );
+
+      if (!updatedUser) {
+        console.error(`User with ID ${userId} not found.`);
+        throw { status: 404, error: 'User not found.' };
+      }
+
+      return updatedUser;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

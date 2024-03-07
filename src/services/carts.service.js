@@ -2,6 +2,7 @@
 import CartsManager from '../dao/cart.manager.js';
 import ProductsService from '../services/products.service.js';
 import TicketService from './ticket.sevice.js';
+import UserService from './users.service.js';
 
 export default class CartsService {
     static async createCart() {
@@ -175,6 +176,29 @@ export default class CartsService {
     
         const updatedCart = await CartsManager.filterFailedPurchases(cart, failedProductIds);
         return updatedCart;
+    }
+
+    static async getCartIdByUserId(userId) {
+        try {
+            // Obtiene el usuario y recupera el ID del carrito asociado (si existe)
+            const user = await UserService.getUserById(userId);
+    
+            if (user && user.cartId) {
+                // Si el usuario tiene un carrito asociado, devuelve su ID
+                return user.cartId;
+            } else {
+                // Si no hay carrito asociado al usuario, crea uno nuevo y actualiza el usuario
+                const newCartId = await CartsManager.addCart();
+                
+                // Actualiza el usuario con el nuevo ID del carrito
+                await UserService.updateUserCartId(userId, newCartId);
+    
+                return newCartId;
+            }
+        } catch (error) {
+            console.error('Error getting cartId by user:', error);
+            throw { status: 500, error: 'Error obtaining cartId.' };
+        }
     }
     
 }

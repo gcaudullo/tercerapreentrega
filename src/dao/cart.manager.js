@@ -33,4 +33,5 @@ export default class CartsManager {
   static async filterFailedPurchases(cart, failedProductIds) {
     return CartRepository.filterFailedPurchases(cart, failedProductIds);
   }
+
 }

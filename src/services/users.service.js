@@ -68,4 +68,24 @@ export default class UsersService {
       throw error;
     }
   }
+
+  static async getUserById(userId) {
+    try {
+      const user = await UserRepository.getUserById(userId);
+      return user;
+    } catch (error) {
+      console.error('Error getting user by ID:', error);
+      throw { status: 500, error: 'Error obtaining user.' };
+    }
+  }
+
+  static async updateUserCartId(userId, newCartId) {
+    try {
+      const updatedUser = await UserRepository.updateUserCartId(userId, newCartId);
+      return updatedUser;
+    } catch (error) {
+      console.error('Error updating user cartId:', error);
+      throw { status: 500, error: 'Error updating user cartId.' };
+    }
+  }
 }
