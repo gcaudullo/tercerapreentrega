@@ -35,7 +35,7 @@ router.get('/getCartId', authMiddleware('jwt'), async (req, res) => {
     }
 });
 
-router.post('/carts/:cid/products/:pid', authMiddleware('jwt'), authRolesMiddleware('admin'), async (req, res) => {
+router.post('/carts/:cid/products/:pid', authMiddleware('jwt'), authRolesMiddleware('user'), async (req, res) => {
     try {
         const result = await CartsController.addProductToCart(req);
         res.status(result.status).json(result.data);

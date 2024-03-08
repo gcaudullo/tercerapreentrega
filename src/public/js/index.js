@@ -53,7 +53,6 @@ socket.on('productDeleted', async (productId) => {
 });
 
 socket.on('update-messages', (messages) => {
-    console.log('messages', messages);
     const logMessages = document.getElementById('log-messages');
     if (logMessages) {
         logMessages.innerText = '';

@@ -5,6 +5,9 @@ import JWT from 'jsonwebtoken'
 import passport from 'passport';
 import config from './config/config.js'
 import { faker } from '@faker-js/faker';
+import jwt from 'jsonwebtoken';
+
+
 
 
 const __filename = url.fileURLToPath(import.meta.url);
@@ -94,18 +97,56 @@ export const authRolesMiddleware = (roles) => (req, res, next) => {
 
 export const generateProduct = () => {
     return {
-      id: faker.database.mongodbObjectId(),
-      title: faker.commerce.productName(),
-      description: faker.lorem.paragraph(),
-      code: faker.string.alphanumeric({ length: 10 }),
-      price: faker.commerce.price(),
-      status: faker.datatype.boolean(),
-      stock: faker.number.int({ min: 100, max: 300 }),
-      category: faker.commerce.department(),
-      thumbnails: faker.image.url(),
-      createdAt: faker.date.anytime(), 
-      updatedAt: faker.date.anytime()
+        id: faker.database.mongodbObjectId(),
+        title: faker.commerce.productName(),
+        description: faker.lorem.paragraph(),
+        code: faker.string.alphanumeric({ length: 10 }),
+        price: faker.commerce.price(),
+        status: faker.datatype.boolean(),
+        stock: faker.number.int({ min: 100, max: 300 }),
+        category: faker.commerce.department(),
+        thumbnails: faker.image.url(),
+        createdAt: faker.date.anytime(),
+        updatedAt: faker.date.anytime()
     }
-  };
+};
 
-  
+export const extractUserFromToken = (req) => {
+    const token = req.signedCookies['token'];
+
+    if (token) {
+        try {
+            const decoded = jwt.verify(token, config.jwtSecret);
+            return decoded;
+        } catch (error) {
+            console.error('Error decoding token:', error);
+        }
+    }
+
+    return null;
+};
+
+// Función para calcular el total de la compra
+export function calculateTotal(products) {
+    // Verifica si hay productos en el carrito
+    if (!products || products.length === 0) {
+        return 0;
+    }
+
+    // Calcula el total considerando la cantidad de cada producto
+    const total = products.reduce((acc, product) => {
+        // Verifica si el producto tiene un precio válido y una cantidad válida
+        if (product.product && typeof product.product.price === 'number' && typeof product.quantity === 'number') {
+            // Suma al acumulador el precio multiplicado por la cantidad
+            return acc + product.product.price * product.quantity;
+        } else {
+            console.warn('Producto con precio o cantidad inválidos:', product);
+            console.log('Precio:', typeof product.product.price, 'Cantidad:', typeof product.quantity);
+            console.log('Producto completo:', product);
+            return acc;
+        }
+    }, 0);
+
+    return total;
+}
+

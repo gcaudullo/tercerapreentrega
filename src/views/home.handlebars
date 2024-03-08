@@ -5,7 +5,10 @@
   <h2>Lista de productos</h2>
   <article>
     {{#if user}}
-      <a href="/views/carts/{{user.cartId}}" role="button" id="goToCartBtn">Ir al Carrito</a>
+    <script>
+      console.log('User details:', {{ user.cart_id }});
+    </script>
+    <a href="/views/carts/{{user.cart_id}}" role="button" id="goToCartBtn">Ir al Carrito</a>
     {{/if}}
     <table>
       <tr>

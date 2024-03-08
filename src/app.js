@@ -8,7 +8,7 @@ import sessionRouter from './routers/users.router.js';
 import handlebars from 'express-handlebars';
 import passport from 'passport';
 import { init as initPassport} from './config/passport.config.js';
-import cookieParse from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 import config from './config/config.js';
 import cors from 'cors';
 
@@ -17,7 +17,7 @@ const app = express();
 
 
 let COOKIE_SECRET = config.cookieSecret
-app.use(cookieParse(COOKIE_SECRET))
+app.use(cookieParser(COOKIE_SECRET))
 
 // const whiteList = config.originsAllowed.split(',');
 // app.use(cors({

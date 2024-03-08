@@ -28,11 +28,13 @@ export default class UsersController {
         signed: true,
       });
 
-      // Crea una instancia de UserDTO utilizando el resultado del servicio
-      const userDTO = new UserDTO(result.user);
+      // // Crea una instancia de UserDTO utilizando el resultado del servicio
+      // const userDTO = new UserDTO(result.user);
 
-      // Envia la respuesta utilizando el DTO
-      res.status(200).json({ user: userDTO, token: result.token });
+      // // Envia la respuesta utilizando el DTO
+      // res.status(200).json({ user: userDTO, token: result.token });
+      // Redirige al usuario a la vista http://localhost:8080/views
+      res.redirect('/views');
     } catch (error) {
       console.error('Error in user login controller:', error);
       res.status(error.status || 500).json({ error: error.error || 'Internal Server Error' });

@@ -1,7 +1,8 @@
 import express from 'express';
 import ProductsService from '../services/products.service.js';
 import CartsService from '../services/carts.service.js';
-import { buildResponsePaginated } from '../utils.js';
+import { buildResponsePaginated, extractUserFromToken } from '../utils.js';
+import { calculateTotal } from '../utils.js';
 
 const router = express.Router();
 
@@ -45,8 +46,11 @@ router.get('/', async (req, res) => {
   try {
     const products = await ProductsService.getProducts(criteria, options);
     const data = buildResponsePaginated({ ...products, sort, category }, 'http://localhost:8080/views');
-    const user = req.user;
-    res.render('home', { title: 'Productos 🚀', products: data, welcomeMessage: user ? `Bienvenido, ${user.first_name}! <br>Rol: ${user.role}` : '' });
+
+    // Extrae el usuario desde el token en la cookie
+    const user = extractUserFromToken(req);
+    console.log('User before rendering:', user);
+    res.render('home', { title: 'Productos 🚀', products: data, user: user, welcomeMessage: user ? `Bienvenido, ${user.first_name}! <br>Rol: ${user.role}` : '' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error obtaining products.' });
@@ -69,11 +73,14 @@ router.get('/carts/:cid', async (req, res) => {
     if (cart === -1) {
       res.status(404).json({ error: 'There is no cart with that ID.' });
     } else {
-      // Imprimir la estructura del objeto cart en la consola
-      console.log('Cart structure:', JSON.stringify(cart, null, 2));
+      // Calcular el total de la compra
+      const totalAmount = calculateTotal(cart.products);
 
-      // Renderiza la vista de carrito con los productos
-      res.render('cart', { title: 'Carrito de Compras', cart: cart.products });
+      // Imprimir la estructura del objeto cart en la consola
+      // console.log('Cart structure:', JSON.stringify(cart, null, 2));
+
+      // Renderiza la vista de carrito con los productos y el total
+      res.render('cart', { title: 'Carrito de Compras', cart: cart.products, totalAmount });
     }
   } catch (error) {
     console.error(error);
